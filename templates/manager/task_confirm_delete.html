@@ -1,13 +1,75 @@
 {% extends 'manager/base_manager.html' %}
-{% block title %}Delete Task{% endblock %}
+{% block title %}Delete Task - Task Queue{% endblock %}
+
 {% block content %}
-<h3 class="mb-4">Delete Task</h3>
-<div class="card card-stat p-4" style="max-width: 500px;">
-  <p>Are you sure you want to delete <strong>"{{ task.title }}"</strong>?</p>
-  <form method="post">
-    {% csrf_token %}
-    <button type="submit" class="btn btn-danger">Yes, delete</button>
-    <a href="{% url 'manager_dashboard' %}" class="btn btn-outline-secondary">Cancel</a>
-  </form>
+<style>
+  .delete-container {
+    max-width: 480px;
+    margin: 40px auto 0;
+  }
+
+  .delete-card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 32px;
+  }
+
+  .delete-card h2 {
+    font-size: 24px;
+    margin-bottom: 12px;
+    color: var(--coral);
+  }
+
+  .delete-card p {
+    font-size: 14px;
+    color: var(--slate);
+    margin-bottom: 24px;
+    line-height: 1.6;
+  }
+
+  .delete-card p strong {
+    color: var(--ink);
+  }
+
+  .actions-group {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .btn-danger {
+    background: var(--coral);
+    border-color: var(--coral);
+    color: #FFFFFF;
+  }
+  .btn-danger:hover {
+    opacity: 0.9;
+  }
+
+  .btn-cancel {
+    background: transparent;
+    color: var(--slate);
+    border: 1px solid var(--line);
+  }
+  .btn-cancel:hover {
+    background: var(--paper);
+    color: var(--ink);
+  }
+</style>
+
+<div class="delete-container">
+  <div class="delete-card">
+    <h2>Delete Task</h2>
+    <p>Are you sure you want to delete <strong>"{{ task.title }}"</strong>? This action cannot be undone.</p>
+    
+    <form method="post">
+      {% csrf_token %}
+      <div class="actions-group">
+        <button type="submit" class="btn btn-danger">Yes, delete</button>
+        <a href="{% url 'manager_dashboard' %}" class="btn btn-cancel">Cancel</a>
+      </div>
+    </form>
+  </div>
 </div>
 {% endblock %}

@@ -12,7 +12,7 @@
 <div class="filters">
   <a href="{% url 'employee:dashboard' %}">All</a>
   <a href="?status=pending">Pending</a>
-  <a href="?status=in_progress">In Progress</a>
+  {% comment %} <a href="?status=in_progress">In Progress</a> {% endcomment %}
   <a href="?status=completed">Completed</a>
 </div>
 

@@ -1,90 +1,201 @@
 {% extends 'manager/base_manager.html' %}
 {% block title %}Dashboard{% endblock %}
+
 {% block content %}
-<h3 class="mb-4">Dashboard</h3>
+<style>
+  .dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+  }
 
-<div class="row g-3 mb-4">
-  <div class="col-md-3">
-    <div class="card card-stat p-3 text-center">
-      <div class="text-muted small">Total Tasks</div>
-      <div class="fs-3 fw-bold">{{ total_tasks }}</div>
-    </div>
+  /* Summary Section */
+  .summary .stat .num.pending-num { color: var(--amber); }
+  .summary .stat .num.completed-num { color: var(--sage); }
+
+  /* Search & Filter Bar */
+  .filter-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 24px;
+    background: var(--card);
+    padding: 16px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+  }
+
+  .filter-form input[type="text"],
+  .filter-form select {
+    padding: 8px 12px;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: var(--ink);
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    outline: none;
+  }
+
+  .filter-form input[type="text"] {
+    min-width: 220px;
+  }
+
+  .filter-form input[type="text"]:focus,
+  .filter-form select:focus {
+    border-color: var(--amber);
+  }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--slate);
+    border: 1px solid var(--line);
+  }
+  .btn-outline:hover {
+    background: var(--paper);
+    color: var(--ink);
+  }
+
+  .btn-clear {
+    background: transparent;
+    color: var(--coral);
+    border: 1px solid var(--line);
+  }
+  .btn-clear:hover {
+    background: #FAE7E1;
+  }
+
+  /* Table Customizations */
+  .table-container {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .table-actions {
+    display: flex;
+    gap: 6px;
+    justify-content: flex-end;
+  }
+
+  .btn-action {
+    padding: 4px 10px;
+    font-size: 12px;
+    border-radius: 4px;
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--slate);
+  }
+  .btn-action:hover {
+    background: var(--paper);
+    color: var(--ink);
+  }
+
+  .btn-action.delete-action {
+    color: var(--coral);
+  }
+  .btn-action.delete-action:hover {
+    background: #FAE7E1;
+    border-color: var(--coral);
+  }
+
+  .empty-state {
+    text-align: center;
+    color: var(--slate-light);
+    padding: 32px 16px !important;
+  }
+</style>
+
+<div class="dashboard-header">
+  <h2>Dashboard</h2>
+  <a href="{% url 'manager_task_create' %}" class="btn">+ Assign New Task</a>
+</div>
+
+<!-- Key Metrics Summary -->
+<div class="summary">
+  <div class="stat">
+    <span class="num">{{ total_tasks }}</span>
+    <span class="label">Total Tasks</span>
   </div>
-  <div class="col-md-3">
-    <div class="card card-stat p-3 text-center">
-      <div class="text-muted small">Pending</div>
-      <div class="fs-3 fw-bold text-warning">{{ pending_count }}</div>
-    </div>
+  <div class="stat">
+    <span class="num pending-num">{{ pending_count }}</span>
+    <span class="label">Pending</span>
   </div>
-  <div class="col-md-3">
-    <div class="card card-stat p-3 text-center">
-      <div class="text-muted small">Completed</div>
-      <div class="fs-3 fw-bold text-success">{{ completed_count }}</div>
-    </div>
+  <div class="stat">
+    <span class="num completed-num">{{ completed_count }}</span>
+    <span class="label">Completed</span>
   </div>
-  <div class="col-md-3">
-    <div class="card card-stat p-3 text-center">
-      <div class="text-muted small">Employees</div>
-      <div class="fs-3 fw-bold">{{ employee_count }}</div>
-    </div>
+  <div class="stat">
+    <span class="num">{{ employee_count }}</span>
+    <span class="label">Employees</span>
   </div>
 </div>
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-  <h5 class="mb-0">All Tasks</h5>
-  <a href="{% url 'manager_task_create' %}" class="btn btn-primary btn-sm">+ Assign New Task</a>
-</div>
+<!-- Filters -->
+<form method="get" class="filter-form">
+  <input type="text" name="q" value="{{ search }}" placeholder="Search title or description...">
+  
+  <select name="status">
+    <option value="">All statuses</option>
+    <option value="pending" {% if current_status == 'pending' %}selected{% endif %}>Pending</option>
+    <option value="in_progress" {% if current_status == 'in_progress' %}selected{% endif %}>In progress</option>
+    <option value="completed" {% if current_status == 'completed' %}selected{% endif %}>Completed</option>
+  </select>
 
-<form method="get" class="row g-2 mb-3">
-  <div class="col-auto">
-    <input type="text" name="q" value="{{ search }}" class="form-control" placeholder="Search title/description">
-  </div>
-  <div class="col-auto">
-    <select name="status" class="form-select">
-      <option value="">All statuses</option>
-      <option value="pending" {% if current_status == 'pending' %}selected{% endif %}>Pending</option>
-      <option value="completed" {% if current_status == 'completed' %}selected{% endif %}>Completed</option>
-    </select>
-  </div>
-  <div class="col-auto">
-    <select name="employee" class="form-select">
-      <option value="">All employees</option>
-      {% for emp in employees %}
+  <select name="employee">
+    <option value="">All employees</option>
+    {% for emp in employees %}
       <option value="{{ emp.id }}" {% if current_employee == emp.id|stringformat:"s" %}selected{% endif %}>{{ emp.username }}</option>
-      {% endfor %}
-    </select>
-  </div>
-  <div class="col-auto">
-    <button class="btn btn-outline-primary" type="submit">Filter</button>
-  </div>
+    {% endfor %}
+  </select>
+
+  <button class="btn btn-outline" type="submit">Filter</button>
+  
   {% if current_status or current_employee or search %}
-  <div class="col-auto">
-    <a href="{% url 'manager_dashboard' %}" class="btn btn-outline-secondary">Clear</a>
-  </div>
+    <a href="{% url 'manager_dashboard' %}" class="btn btn-clear">Clear</a>
   {% endif %}
 </form>
 
-<div class="card card-stat">
-  <table class="table mb-0 align-middle">
+<!-- Tasks Table -->
+<div class="table-container">
+  <table>
     <thead>
-      <tr><th>Title</th><th>Assigned To</th><th>Status</th><th>Due</th><th>Created</th><th></th></tr>
+      <tr>
+        <th>Title</th>
+        <th>Assigned To</th>
+        <th>Status</th>
+        <th>Due</th>
+        <th>Created</th>
+        <th style="text-align: right;">Actions</th>
+      </tr>
     </thead>
     <tbody>
       {% for task in tasks %}
-      <tr>
-        <td>{{ task.title }}</td>
-        <td>{{ task.assigned_to.username }}</td>
-        <td><span class="status-{{ task.status }}">{{ task.get_status_display }}</span></td>
-        <td>{{ task.due_date|default:"—" }}</td>
-        <td>{{ task.created_at|date:"M d, Y" }}</td>
-        <td>
-          <a href="{% url 'manager_task_detail' task.pk %}" class="btn btn-sm btn-outline-secondary">View</a>
-          <a href="{% url 'manager_task_update' task.pk %}" class="btn btn-sm btn-outline-primary">Edit</a>
-          <a href="{% url 'manager_task_delete' task.pk %}" class="btn btn-sm btn-outline-danger">Delete</a>
-        </td>
-      </tr>
+        <tr class="status-{{ task.status }}">
+          <td><strong>{{ task.title }}</strong></td>
+          <td>{{ task.assigned_to.username }}</td>
+          <td>
+            <span class="badge {{ task.status }}">
+              {{ task.get_status_display }}
+            </span>
+          </td>
+          <td class="due">{{ task.due_date|default:"—" }}</td>
+          <td>{{ task.created_at|date:"M d, Y" }}</td>
+          <td>
+            <div class="table-actions">
+              <a href="{% url 'manager_task_detail' task.pk %}" class="btn-action">View</a>
+              <a href="{% url 'manager_task_update' task.pk %}" class="btn-action">Edit</a>
+              <a href="{% url 'manager_task_delete' task.pk %}" class="btn-action delete-action">Delete</a>
+            </div>
+          </td>
+        </tr>
       {% empty %}
-      <tr><td colspan="6" class="text-center text-muted py-3">No tasks match your filters.</td></tr>
+        <tr>
+          <td colspan="6" class="empty-state">No tasks match your filters.</td>
+        </tr>
       {% endfor %}
     </tbody>
   </table>

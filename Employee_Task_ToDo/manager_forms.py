@@ -18,6 +18,21 @@ class TaskForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         # Only employees should show up in the assignment dropdown
         self.fields['assigned_to'].queryset = User.objects.filter(
-            profile__role='employee'
+            groups__name='Employee'
         ).order_by('username')
         self.fields['assigned_to'].label = 'Assign to'
+        
+        
+class EmployeeCreationForm(forms.ModelForm):
+    password = forms.CharField(widget=forms.PasswordInput)
+
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'password']
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.set_password(self.cleaned_data['password'])  # Hashes password
+        if commit:
+            user.save()
+        return user

@@ -65,3 +65,13 @@ def employee_dashboard(request):
         return redirect("manager_dashboard")
 
     return render(request, "accounts/employee_dashboard.html")
+
+def _is_manager(user):
+    profile = getattr(user, 'profile', None)
+    return user.is_superuser or (profile is not None and profile.role == 'admin')
+
+@login_required
+def post_login_redirect(request):
+    if _is_manager(request.user):
+        return redirect('manager_dashboard')
+    return redirect('employee:dashboard')

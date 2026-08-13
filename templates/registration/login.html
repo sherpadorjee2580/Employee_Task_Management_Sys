@@ -1,32 +1,115 @@
 {% extends "base.html" %}
 
-{% block title %}Login{% endblock %}
+{% block title %}Login - Task Queue{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center mt-5">
-    <div class="col-md-4">
-        <div class="card shadow-sm">
-            <div class="card-body p-4">
-                <h3 class="text-center mb-4">Login</h3>
-                <form method="post">
-                    {% csrf_token %}
-                    <div class="mb-3">
-                        <label for="id_username" class="form-label">Username</label>
-                        {{ form.username }}
-                    </div>
-                    <div class="mb-3">
-                        <label for="id_password" class="form-label">Password</label>
-                        {{ form.password }}
-                    </div>
-                    {% if form.errors %}
-                    <div class="alert alert-danger py-2">
-                        Invalid username or password.
-                    </div>
-                    {% endif %}
-                    <button type="submit" class="btn btn-primary w-100">Login</button>
-                </form>
-            </div>
-        </div>
-    </div>
+<style>
+  .auth-container {
+    max-width: 420px;
+    margin: 40px auto 0;
+  }
+
+  .auth-card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 32px;
+    box-shadow: 0 4px 12px rgba(27, 36, 48, 0.03);
+  }
+
+  .auth-card h2 {
+    font-size: 24px;
+    margin-bottom: 8px;
+    text-align: center;
+  }
+
+  .auth-subtitle {
+    font-size: 13px;
+    color: var(--slate-light);
+    text-align: center;
+    margin-bottom: 24px;
+  }
+
+  .form-group {
+    margin-bottom: 18px;
+  }
+
+  .form-group label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--slate-light);
+    margin-bottom: 6px;
+  }
+
+  /* Target Django's default rendered input fields */
+  .form-group input[type="text"],
+  .form-group input[type="password"] {
+    width: 100%;
+    padding: 10px 14px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: var(--ink);
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    transition: border-color 0.2s ease, outline 0.2s ease;
+  }
+
+  .form-group input[type="text"]:focus,
+  .form-group input[type="password"]:focus {
+    outline: none;
+    border-color: var(--amber);
+    background: var(--card);
+  }
+
+  .btn-submit {
+    width: 100%;
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    margin-top: 8px;
+  }
+
+  .error-alert {
+    background: #FDF2F0;
+    border-left: 3px solid var(--coral);
+    color: var(--coral);
+    padding: 10px 14px;
+    border-radius: 4px;
+    font-size: 13px;
+    margin-bottom: 18px;
+  }
+</style>
+
+<div class="auth-container">
+  <div class="auth-card">
+    <h2>Sign In</h2>
+    <p class="auth-subtitle">Welcome back! Please enter your credentials.</p>
+
+    {% if form.errors %}
+      <div class="error-alert">
+        Invalid username or password. Please try again.
+      </div>
+    {% endif %}
+
+    <form method="post">
+      {% csrf_token %}
+      
+      <div class="form-group">
+        <label for="{{ form.username.id_for_label }}">Username</label>
+        {{ form.username }}
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.password.id_for_label }}">Password</label>
+        {{ form.password }}
+      </div>
+
+      <button type="submit" class="btn btn-submit">Login</button>
+    </form>
+  </div>
 </div>
 {% endblock %}

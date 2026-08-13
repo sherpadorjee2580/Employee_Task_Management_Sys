@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from . import manager_views  # <--- Add this line
 
 app_name = 'employee'
 
@@ -11,4 +12,6 @@ urlpatterns = [
     path('task/<int:task_id>/in-progress/', views.mark_task_in_progress, name='mark_task_in_progress'),
     path('task/<int:task_id>/complete/', views.mark_task_complete, name='mark_task_complete'),
     path('history/', views.completed_tasks_history, name='history'),
+    path('manager/employees/', manager_views.employee_list, name='manager_employee_list'),  
+    path('manager/employees/add/', manager_views.add_employee, name='manager_add_employee'),
 ]

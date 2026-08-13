@@ -1,19 +1,156 @@
 {% extends 'manager/base_manager.html' %}
-{% block title %}Task Detail{% endblock %}
+{% block title %}{{ task.title }} - Task Queue{% endblock %}
+
 {% block content %}
-<h3 class="mb-4">{{ task.title }}</h3>
-<div class="card card-stat p-4" style="max-width: 600px;">
-  <p><strong>Description:</strong><br>{{ task.description|default:"No description." }}</p>
-  <p><strong>Assigned to:</strong> {{ task.assigned_to.username }}</p>
-  <p><strong>Assigned by:</strong> {{ task.assigned_by.username }}</p>
-  <p><strong>Status:</strong> <span class="status-{{ task.status }}">{{ task.get_status_display }}</span></p>
-  <p><strong>Due date:</strong> {{ task.due_date|default:"—" }}</p>
-  <p><strong>Created:</strong> {{ task.created_at|date:"M d, Y H:i" }}</p>
-  {% if task.completed_at %}<p><strong>Completed at:</strong> {{ task.completed_at|date:"M d, Y H:i" }}</p>{% endif %}
-  <div class="mt-3">
-    <a href="{% url 'manager_task_update' task.pk %}" class="btn btn-primary btn-sm">Edit</a>
-    <a href="{% url 'manager_task_delete' task.pk %}" class="btn btn-danger btn-sm">Delete</a>
-    <a href="{% url 'manager_dashboard' %}" class="btn btn-outline-secondary btn-sm">Back to list</a>
+<style>
+  .detail-container {
+    max-width: 640px;
+  }
+
+  .detail-header {
+    margin-bottom: 20px;
+  }
+
+  .detail-header h2 {
+    font-size: 26px;
+    margin-bottom: 8px;
+  }
+
+  .detail-card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 28px;
+    margin-bottom: 24px;
+  }
+
+  .detail-field {
+    margin-bottom: 18px;
+    font-size: 14px;
+  }
+
+  .detail-field:last-child {
+    margin-bottom: 0;
+  }
+
+  .detail-field label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--slate-light);
+    margin-bottom: 4px;
+  }
+
+  .detail-field .value {
+    color: var(--ink);
+    line-height: 1.5;
+  }
+
+  .detail-field .value.description {
+    background: var(--paper);
+    padding: 12px 14px;
+    border-radius: 6px;
+    border: 1px solid var(--line);
+    white-space: pre-wrap;
+  }
+
+  .mono-date {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--slate);
+  }
+
+  .actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-top: 24px;
+  }
+
+  .btn-danger {
+    background: var(--coral);
+    border-color: var(--coral);
+    color: #FFFFFF;
+  }
+  .btn-danger:hover {
+    opacity: 0.9;
+  }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--slate);
+    border: 1px solid var(--line);
+  }
+  .btn-outline:hover {
+    background: var(--paper);
+    color: var(--ink);
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-top: 20px;
+    font-size: 13px;
+    color: var(--slate);
+  }
+  .back-link:hover {
+    color: var(--ink);
+  }
+</style>
+
+<div class="detail-container">
+  <div class="detail-header">
+    <h2>{{ task.title }}</h2>
+  </div>
+
+  <div class="detail-card">
+    <div class="detail-field">
+      <label>Description</label>
+      <div class="value description">{{ task.description|default:"No description." }}</div>
+    </div>
+
+    <div class="detail-field">
+      <label>Status</label>
+      <div class="value">
+        <span class="badge {{ task.status }}">
+          {{ task.get_status_display }}
+        </span>
+      </div>
+    </div>
+
+    <div class="detail-field">
+      <label>Assigned To</label>
+      <div class="value"><strong>{{ task.assigned_to.username }}</strong></div>
+    </div>
+
+    <div class="detail-field">
+      <label>Assigned By</label>
+      <div class="value">{{ task.assigned_by.username }}</div>
+    </div>
+
+    <div class="detail-field">
+      <label>Due Date</label>
+      <div class="value mono-date">{{ task.due_date|default:"—" }}</div>
+    </div>
+
+    <div class="detail-field">
+      <label>Created</label>
+      <div class="value mono-date">{{ task.created_at|date:"M d, Y H:i" }}</div>
+    </div>
+
+    {% if task.completed_at %}
+      <div class="detail-field">
+        <label>Completed At</label>
+        <div class="value mono-date">{{ task.completed_at|date:"M d, Y H:i" }}</div>
+      </div>
+    {% endif %}
+
+    <div class="actions">
+      <a href="{% url 'manager_task_update' task.pk %}" class="btn">Edit</a>
+      <a href="{% url 'manager_task_delete' task.pk %}" class="btn btn-danger">Delete</a>
+      <a href="{% url 'manager_dashboard' %}" class="btn btn-outline">Back to list</a>
+    </div>
   </div>
 </div>
 {% endblock %}

@@ -1,23 +1,78 @@
 {% extends 'manager/base_manager.html' %}
-{% block title %}Employees{% endblock %}
+{% block title %}Employees - Task Queue{% endblock %}
+
 {% block content %}
-<h3 class="mb-4">Employees</h3>
-<div class="card card-stat">
-  <table class="table mb-0 align-middle">
+<style>
+  /* Updated to align title and button side-by-side */
+  .page-header {
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .table-container {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .stat-count {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  .stat-pending {
+    color: #8A5F16;
+  }
+
+  .stat-completed {
+    color: #315B4F;
+  }
+
+  .user-email {
+    color: var(--slate);
+  }
+
+  .empty-state {
+    text-align: center;
+    color: var(--slate-light);
+    padding: 32px 16px !important;
+  }
+</style>
+
+<div class="page-header">
+  <h2>Employees</h2>
+  <!-- Added "Add Employee" button -->
+  <a href="{% url 'employee:manager_add_employee' %}" class="btn">+ Add Employee</a>
+</div>
+
+<div class="table-container">
+  <table>
     <thead>
-      <tr><th>Username</th><th>Email</th><th>Total</th><th>Pending</th><th>Completed</th></tr>
+      <tr>
+        <th>Username</th>
+        <th>Email</th>
+        <th>Total Tasks</th>
+        <th>Pending</th>
+        <th>Completed</th>
+      </tr>
     </thead>
     <tbody>
       {% for emp in employees %}
-      <tr>
-        <td>{{ emp.username }}</td>
-        <td>{{ emp.email|default:"—" }}</td>
-        <td>{{ emp.total_tasks }}</td>
-        <td>{{ emp.pending_tasks }}</td>
-        <td>{{ emp.completed_tasks }}</td>
-      </tr>
+        <tr>
+          <td><strong>{{ emp.username }}</strong></td>
+          <td class="user-email">{{ emp.email|default:"—" }}</td>
+          <td class="stat-count">{{ emp.total_tasks }}</td>
+          <td class="stat-count stat-pending">{{ emp.pending_tasks }}</td>
+          <td class="stat-count stat-completed">{{ emp.completed_tasks }}</td>
+        </tr>
       {% empty %}
-      <tr><td colspan="5" class="text-center text-muted py-3">No employees found.</td></tr>
+        <tr>
+          <td colspan="5" class="empty-state">No employees found.</td>
+        </tr>
       {% endfor %}
     </tbody>
   </table>

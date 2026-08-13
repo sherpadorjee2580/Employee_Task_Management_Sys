@@ -131,6 +131,5 @@ MAILERS = {
 
 # LOGOUT_REDIRECT_URL = 'login'
 LOGIN_URL = 'login'
-LOGIN_REDIRECT_URL = '/employee/dashboard/'
-LOGOUT_REDIRECT_URL = '/accounts/login/'
-
+LOGIN_REDIRECT_URL = 'post_login_redirect'
+LOGOUT_REDIRECT_URL = 'login'

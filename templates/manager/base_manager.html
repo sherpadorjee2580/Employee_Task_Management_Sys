@@ -2,45 +2,270 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>{% block title %}Manager Panel{% endblock %} | Employee Task Manager</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<title>{% block title %}Manager Panel{% endblock %} | Task Queue</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  body { background-color: #f4f6f9; }
-  .navbar-brand { font-weight: 600; }
-  .card-stat { border: none; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
-  .status-pending { background-color: #fff3cd; color: #856404; padding: 3px 10px; border-radius: 20px; font-size: 0.85rem; }
-  .status-completed { background-color: #d4edda; color: #155724; padding: 3px 10px; border-radius: 20px; font-size: 0.85rem; }
+  :root {
+    --ink: #1B2430;
+    --paper: #F7F5F1;
+    --slate: #445064;
+    --slate-light: #7C879A;
+    --amber: #E8A33D;
+    --sage: #4C8577;
+    --coral: #C1543C;
+    --line: #E1DDD3;
+    --card: #FFFFFF;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  h1, h2, h3 { font-family: 'Fraunces', serif; font-weight: 600; margin: 0; }
+  a { color: var(--ink); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  :focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+
+  /* Topbar Navigation */
+  .topbar {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 18px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  
+  .topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+  }
+
+  .topbar .brand { 
+    font-family: 'Fraunces', serif; 
+    font-size: 20px; 
+    font-weight: 600; 
+    letter-spacing: 0.01em; 
+    color: var(--paper);
+  }
+  .topbar .brand span { color: var(--amber); }
+
+  .topbar nav {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  
+  .topbar nav a { 
+    color: var(--slate-light); 
+    font-size: 13px; 
+    font-weight: 500; 
+  }
+  .topbar nav a:hover { color: var(--paper); text-decoration: none; }
+
+  .topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .topbar .user-greeting {
+    font-size: 13px;
+    color: var(--slate-light);
+  }
+
+  .topbar .nav-logout-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    color: var(--slate-light);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .topbar .nav-logout-btn:hover {
+    color: var(--paper);
+    opacity: 1;
+  }
+
+  /* Main Container */
+  .page { 
+    max-width: 880px; 
+    margin: 0 auto; 
+    padding: 40px 32px 80px; 
+  }
+
+  /* Django Messages / Alerts */
+  .messages-container {
+    margin-bottom: 24px;
+  }
+
+  .alert {
+    padding: 12px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--card);
+    border: 1px solid var(--line);
+  }
+
+  .alert.alert-success, .alert.alert-info {
+    background: #EFF6F3;
+    border-left: 3px solid var(--sage);
+    color: #315B4F;
+  }
+
+  .alert.alert-warning, .alert.alert-pending {
+    background: #FBF0DD;
+    border-left: 3px solid var(--amber);
+    color: #8A5F16;
+  }
+
+  .alert.alert-danger, .alert.alert-error {
+    background: #FAE7E1;
+    border-left: 3px solid var(--coral);
+    color: #9A3E29;
+  }
+
+  /* Reusable Utilities for Child Templates */
+  .summary {
+    display: flex;
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 28px;
+  }
+  .summary .stat {
+    flex: 1;
+    background: var(--card);
+    padding: 16px 20px;
+  }
+  .summary .stat .num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 24px;
+    font-weight: 500;
+    display: block;
+  }
+  .summary .stat .label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--slate-light);
+  }
+
+  .filters { display: flex; gap: 4px; margin-bottom: 24px; }
+  .filters a {
+    padding: 6px 14px;
+    border-radius: 100px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--slate);
+    border: 1px solid var(--line);
+  }
+  .filters a:hover { background: var(--card); text-decoration: none; }
+
+  table { width: 100%; border-collapse: collapse; background: var(--card); border-radius: 10px; overflow: hidden; border: 1px solid var(--line); }
+  thead th {
+    text-align: left;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--slate-light);
+    font-weight: 600;
+    padding: 12px 18px;
+    border-bottom: 1px solid var(--line);
+  }
+  tbody tr { border-bottom: 1px solid var(--line); }
+  tbody tr:last-child { border-bottom: none; }
+  tbody td { padding: 14px 18px; font-size: 14px; vertical-align: middle; }
+  tbody tr td:first-child { border-left: 3px solid transparent; }
+  tbody tr.status-pending td:first-child { border-left-color: var(--amber); }
+  tbody tr.status-in_progress td:first-child { border-left-color: var(--coral); }
+  tbody tr.status-completed td:first-child { border-left-color: var(--sage); }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 4px 10px 4px 8px;
+    border-radius: 100px;
+  }
+  .badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; }
+  .badge.pending { background: #FBF0DD; color: #8A5F16; }
+  .badge.pending::before { background: var(--amber); }
+  .badge.in_progress { background: #FAE7E1; color: #9A3E29; }
+  .badge.in_progress::before { background: var(--coral); }
+  .badge.completed { background: #E4EFEA; color: #315B4F; }
+  .badge.completed::before { background: var(--sage); }
+
+  button, .btn {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 7px 14px;
+    border-radius: 6px;
+    border: 1px solid var(--ink);
+    background: var(--ink);
+    color: var(--paper);
+    cursor: pointer;
+    display: inline-block;
+  }
+  button:hover, .btn:hover { opacity: 0.85; text-decoration: none; }
+  form { display: inline; }
 </style>
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark px-4">
-  <a class="navbar-brand" href="{% url 'manager_dashboard' %}">📋 Manager Panel</a>
-  <div class="collapse navbar-collapse">
-    <ul class="navbar-nav me-auto">
-      <li class="nav-item"><a class="nav-link" href="{% url 'manager_dashboard' %}">Dashboard</a></li>
-      <li class="nav-item"><a class="nav-link" href="{% url 'manager_employee_list' %}">Employees</a></li>
-    </ul>
+
+  <div class="topbar">
+    <div class="topbar-left">
+      <a class="brand" href="{% url 'manager_dashboard' %}">Task<span>Queue</span></a>
+      <nav>
+        <a href="{% url 'manager_dashboard' %}">Dashboard</a>
+        <a href="{% url 'manager_employee_list' %}">Employees</a>
+      </nav>
+    </div>
+    
+    <div class="topbar-right">
+      <span class="user-greeting">Hi, {{ request.user.username }}</span>
+      <form action="{% url 'logout' %}" method="post">
+        {% csrf_token %}
+        <button class="nav-logout-btn" type="submit">Logout</button>
+      </form>
+    </div>
   </div>
-  <span class="navbar-text text-light me-3">Hi, {{ request.user.username }}</span>
-  <form action="{% url 'logout' %}" method="post" class="d-inline">
-    {% csrf_token %}
-    <button class="btn btn-outline-light btn-sm" type="submit">Logout</button>
-  </form>
-</nav>
 
-<div class="container mt-4">
-  {% if messages %}
-    {% for message in messages %}
-      <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-        {{ message }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  <div class="page">
+    {% if messages %}
+      <div class="messages-container">
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }}">
+            <span>{{ message }}</span>
+          </div>
+        {% endfor %}
       </div>
-    {% endfor %}
-  {% endif %}
-  {% block content %}{% endblock %}
-</div>
+    {% endif %}
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    {% block content %}{% endblock %}
+  </div>
+
 </body>
 </html>
