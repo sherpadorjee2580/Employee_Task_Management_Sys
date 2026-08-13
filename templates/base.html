@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}Task Queue{% endblock %}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1B2430;
+    --paper: #F7F5F1;
+    --slate: #445064;
+    --slate-light: #7C879A;
+    --amber: #E8A33D;
+    --sage: #4C8577;
+    --coral: #C1543C;
+    --line: #E1DDD3;
+    --card: #FFFFFF;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+  h1, h2, h3 { font-family: 'Fraunces', serif; font-weight: 600; margin: 0; }
+  a { color: var(--ink); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  :focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+
+  .topbar {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 18px 32px;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+  }
+  .topbar .brand { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 600; letter-spacing: 0.01em; }
+  .topbar .brand span { color: var(--amber); }
+  .topbar nav a { color: var(--slate-light); font-size: 13px; margin-left: 20px; font-weight: 500; }
+  .topbar nav a:hover { color: var(--paper); text-decoration: none; }
+
+  .page { max-width: 880px; margin: 0 auto; padding: 40px 32px 80px; }
+
+  h2 { font-size: 28px; margin-bottom: 24px; }
+
+  .summary {
+    display: flex;
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 28px;
+  }
+  .summary .stat {
+    flex: 1;
+    background: var(--card);
+    padding: 16px 20px;
+  }
+  .summary .stat .num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 24px;
+    font-weight: 500;
+    display: block;
+  }
+  .summary .stat .label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--slate-light);
+  }
+
+  .filters { display: flex; gap: 4px; margin-bottom: 24px; }
+  .filters a {
+    padding: 6px 14px;
+    border-radius: 100px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--slate);
+    border: 1px solid var(--line);
+  }
+  .filters a:hover { background: var(--card); text-decoration: none; }
+
+  .alert {
+    background: #EFF6F3;
+    border-left: 3px solid var(--sage);
+    padding: 10px 16px;
+    border-radius: 4px;
+    font-size: 14px;
+    margin-bottom: 16px;
+  }
+
+  table { width: 100%; border-collapse: collapse; background: var(--card); border-radius: 10px; overflow: hidden; border: 1px solid var(--line); }
+  thead th {
+    text-align: left;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--slate-light);
+    font-weight: 600;
+    padding: 12px 18px;
+    border-bottom: 1px solid var(--line);
+  }
+  tbody tr { border-bottom: 1px solid var(--line); }
+  tbody tr:last-child { border-bottom: none; }
+  tbody td { padding: 14px 18px; font-size: 14px; vertical-align: middle; }
+  tbody tr td:first-child { border-left: 3px solid transparent; }
+  tbody tr.status-pending td:first-child { border-left-color: var(--amber); }
+  tbody tr.status-in_progress td:first-child { border-left-color: var(--coral); }
+  tbody tr.status-completed td:first-child { border-left-color: var(--sage); }
+  td.due { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--slate); }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 4px 10px 4px 8px;
+    border-radius: 100px;
+  }
+  .badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; }
+  .badge.pending { background: #FBF0DD; color: #8A5F16; }
+  .badge.pending::before { background: var(--amber); }
+  .badge.in_progress { background: #FAE7E1; color: #9A3E29; }
+  .badge.in_progress::before { background: var(--coral); }
+  .badge.completed { background: #E4EFEA; color: #315B4F; }
+  .badge.completed::before { background: var(--sage); }
+
+  button, .btn {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 7px 14px;
+    border-radius: 6px;
+    border: 1px solid var(--ink);
+    background: var(--ink);
+    color: var(--paper);
+    cursor: pointer;
+  }
+  button:hover, .btn:hover { opacity: 0.85; text-decoration: none; }
+  form { display: inline; }
+
+  .back-link { display: inline-block; margin-top: 24px; font-size: 13px; color: var(--slate); }
+  .detail-field { margin-bottom: 10px; font-size: 14px; }
+  .detail-field strong { color: var(--slate-light); font-weight: 500; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 2px; }
+  .detail-card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 24px; margin-bottom: 24px; }
+  .actions { display: flex; gap: 8px; margin-top: 20px; }
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="brand">Task<span>Queue</span></div>
+    <nav>
+      {% if user.is_authenticated %}
+        <a href="{% url 'employee:dashboard' %}">Dashboard</a>
+        <a href="{% url 'employee:history' %}">History</a>
+      {% endif %}
+    </nav>
+  </div>
+  <div class="page">
+    {% block content %}{% endblock %}
+  </div>
+</body>
+</html>
