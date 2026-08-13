@@ -1,0 +1,25 @@
+{% extends 'manager/base_manager.html' %}
+{% block title %}Employees{% endblock %}
+{% block content %}
+<h3 class="mb-4">Employees</h3>
+<div class="card card-stat">
+  <table class="table mb-0 align-middle">
+    <thead>
+      <tr><th>Username</th><th>Email</th><th>Total</th><th>Pending</th><th>Completed</th></tr>
+    </thead>
+    <tbody>
+      {% for emp in employees %}
+      <tr>
+        <td>{{ emp.username }}</td>
+        <td>{{ emp.email|default:"—" }}</td>
+        <td>{{ emp.total_tasks }}</td>
+        <td>{{ emp.pending_tasks }}</td>
+        <td>{{ emp.completed_tasks }}</td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="5" class="text-center text-muted py-3">No employees found.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

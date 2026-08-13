@@ -1,0 +1,92 @@
+{% extends 'manager/base_manager.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<h3 class="mb-4">Dashboard</h3>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-3">
+    <div class="card card-stat p-3 text-center">
+      <div class="text-muted small">Total Tasks</div>
+      <div class="fs-3 fw-bold">{{ total_tasks }}</div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card card-stat p-3 text-center">
+      <div class="text-muted small">Pending</div>
+      <div class="fs-3 fw-bold text-warning">{{ pending_count }}</div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card card-stat p-3 text-center">
+      <div class="text-muted small">Completed</div>
+      <div class="fs-3 fw-bold text-success">{{ completed_count }}</div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card card-stat p-3 text-center">
+      <div class="text-muted small">Employees</div>
+      <div class="fs-3 fw-bold">{{ employee_count }}</div>
+    </div>
+  </div>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h5 class="mb-0">All Tasks</h5>
+  <a href="{% url 'manager_task_create' %}" class="btn btn-primary btn-sm">+ Assign New Task</a>
+</div>
+
+<form method="get" class="row g-2 mb-3">
+  <div class="col-auto">
+    <input type="text" name="q" value="{{ search }}" class="form-control" placeholder="Search title/description">
+  </div>
+  <div class="col-auto">
+    <select name="status" class="form-select">
+      <option value="">All statuses</option>
+      <option value="pending" {% if current_status == 'pending' %}selected{% endif %}>Pending</option>
+      <option value="completed" {% if current_status == 'completed' %}selected{% endif %}>Completed</option>
+    </select>
+  </div>
+  <div class="col-auto">
+    <select name="employee" class="form-select">
+      <option value="">All employees</option>
+      {% for emp in employees %}
+      <option value="{{ emp.id }}" {% if current_employee == emp.id|stringformat:"s" %}selected{% endif %}>{{ emp.username }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-auto">
+    <button class="btn btn-outline-primary" type="submit">Filter</button>
+  </div>
+  {% if current_status or current_employee or search %}
+  <div class="col-auto">
+    <a href="{% url 'manager_dashboard' %}" class="btn btn-outline-secondary">Clear</a>
+  </div>
+  {% endif %}
+</form>
+
+<div class="card card-stat">
+  <table class="table mb-0 align-middle">
+    <thead>
+      <tr><th>Title</th><th>Assigned To</th><th>Status</th><th>Due</th><th>Created</th><th></th></tr>
+    </thead>
+    <tbody>
+      {% for task in tasks %}
+      <tr>
+        <td>{{ task.title }}</td>
+        <td>{{ task.assigned_to.username }}</td>
+        <td><span class="status-{{ task.status }}">{{ task.get_status_display }}</span></td>
+        <td>{{ task.due_date|default:"—" }}</td>
+        <td>{{ task.created_at|date:"M d, Y" }}</td>
+        <td>
+          <a href="{% url 'manager_task_detail' task.pk %}" class="btn btn-sm btn-outline-secondary">View</a>
+          <a href="{% url 'manager_task_update' task.pk %}" class="btn btn-sm btn-outline-primary">Edit</a>
+          <a href="{% url 'manager_task_delete' task.pk %}" class="btn btn-sm btn-outline-danger">Delete</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="6" class="text-center text-muted py-3">No tasks match your filters.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
