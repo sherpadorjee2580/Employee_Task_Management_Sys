@@ -21,9 +21,9 @@ class Profile(models.Model):
 @receiver(post_save, sender=User)
 def create_or_update_profile(sender, instance, created, **kwargs):
     if created:
-        Profile.objects.create(user=instance)
+        Profile.objects.get_or_create(user=instance)
     else:
-        instance.profile.save()
+        Profile.objects.get_or_create(user=instance)
 
 
 class Task(models.Model):
