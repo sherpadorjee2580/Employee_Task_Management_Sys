@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Completed Task History</h2>
+<table>
+  <thead>
+    <tr><th>Title</th><th>Completed On</th></tr>
+  </thead>
+  <tbody>
+    {% for task in tasks %}
+    <tr class="status-completed">
+      <td>{{ task.title }}</td>
+      <td class="due">{{ task.completed_at }}</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="2">No completed tasks yet.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+<a class="back-link" href="{% url 'employee:dashboard' %}">← Back to Dashboard</a>
+{% endblock %}

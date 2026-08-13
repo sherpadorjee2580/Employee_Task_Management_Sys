@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>My Tasks</h2>
+
+<div class="summary">
+  <div class="stat"><span class="num">{{ total_count }}</span><span class="label">Total</span></div>
+  <div class="stat"><span class="num">{{ pending_count }}</span><span class="label">Pending</span></div>
+  <div class="stat"><span class="num">{{ in_progress_count }}</span><span class="label">In Progress</span></div>
+  <div class="stat"><span class="num">{{ completed_count }}</span><span class="label">Completed</span></div>
+</div>
+
+<div class="filters">
+  <a href="{% url 'employee:dashboard' %}">All</a>
+  <a href="?status=pending">Pending</a>
+  <a href="?status=in_progress">In Progress</a>
+  <a href="?status=completed">Completed</a>
+</div>
+
+{% if messages %}
+  {% for message in messages %}
+    <p class="alert">{{ message }}</p>
+  {% endfor %}
+{% endif %}
+
+<table>
+  <thead>
+    <tr>
+      <th>Title</th>
+      <th>Priority</th>
+      <th>Due Date</th>
+      <th>Status</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for task in tasks %}
+    <tr class="status-{{ task.status }}">
+      <td><a href="{% url 'employee:task_detail' task.id %}">{{ task.title }}</a></td>
+      <td>{{ task.priority }}</td>
+      <td class="due">{{ task.due_date }}</td>
+      <td><span class="badge {{ task.status }}">{{ task.get_status_display }}</span></td>
+      <td>
+        {% if task.status != 'completed' %}
+        <form method="post" action="{% url 'employee:mark_task_complete' task.id %}">
+          {% csrf_token %}
+          <button type="submit">Mark Complete</button>
+        </form>
+        {% else %}
+          &mdash;
+        {% endif %}
+      </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="5">No tasks assigned yet.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<a class="back-link" href="{% url 'employee:history' %}">View Completed History →</a>
+{% endblock %}

@@ -128,4 +128,9 @@ MAILERS = {
     },
 }
 
-LOGOUT_REDIRECT_URL = 'login'
+
+# LOGOUT_REDIRECT_URL = 'login'
+LOGIN_URL = 'employee:login'
+LOGIN_REDIRECT_URL = '/employee/dashboard/'
+LOGOUT_REDIRECT_URL = '/accounts/login/'
+

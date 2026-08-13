@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>{{ task.title }}</h2>
+
+<div class="detail-card">
+  <div class="detail-field"><strong>Description</strong>{{ task.description }}</div>
+  <div class="detail-field"><strong>Assigned By</strong>{{ task.assigned_by.get_full_name|default:task.assigned_by.username }}</div>
+  <div class="detail-field"><strong>Priority</strong>{{ task.priority }}</div>
+  <div class="detail-field"><strong>Due Date</strong><span class="due">{{ task.due_date }}</span></div>
+  <div class="detail-field"><strong>Status</strong><span class="badge {{ task.status }}">{{ task.get_status_display }}</span></div>
+</div>
+
+<div class="actions">
+  {% if task.status == 'pending' %}
+  <form method="post" action="{% url 'employee:mark_task_in_progress' task.id %}">
+    {% csrf_token %}
+    <button type="submit">Start Task</button>
+  </form>
+  {% endif %}
+
+  {% if task.status != 'completed' %}
+  <form method="post" action="{% url 'employee:mark_task_complete' task.id %}">
+    {% csrf_token %}
+    <button type="submit">Mark as Complete</button>
+  </form>
+  {% else %}
+  <p class="alert">Completed on {{ task.completed_at }}</p>
+  {% endif %}
+</div>
+
+<a class="back-link" href="{% url 'employee:dashboard' %}">← Back to Dashboard</a>
+{% endblock %}
