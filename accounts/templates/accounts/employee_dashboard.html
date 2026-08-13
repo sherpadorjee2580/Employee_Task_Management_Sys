@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Employee Dashboard</title>
+</head>
+
+<body>
+
+    <h1>Employee Dashboard</h1>
+
+    <h2>Welcome, {{ user.username }}</h2>
+
+    <p>You are logged in as an Employee.</p>
+
+    <hr>
+
+    <h3>Employee Functions</h3>
+
+    <ul>
+        <li>View My Tasks</li>
+        <li>Work on Assigned Tasks</li>
+        <li>Update Task Progress</li>
+        <li>Mark Task as Completed</li>
+    </ul>
+
+    <a href="{% url 'logout' %}">
+        <button>Logout</button>
+    </a>
+
+</body>
+</html>

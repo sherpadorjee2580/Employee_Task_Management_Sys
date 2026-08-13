@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Manager Dashboard</title>
+</head>
+
+<body>
+
+    <h1>Manager Dashboard</h1>
+
+    <h2>Welcome,{{ user.username }}</h2>
+
+    <p>You are logged in as a Manager.</p>
+
+    <hr>
+
+    <h3>Manager Functions</h3>
+
+    <ul>
+        <li>View Employees</li>
+        <li>Assign Tasks</li>
+        <li>Manage Tasks</li>
+        <li>Monitor Task Status</li>
+    </ul>
+
+    <a href="{% url 'logout' %}">
+        <button>Logout</button>
+    </a>
+
+</body>
+</html>
